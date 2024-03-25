@@ -30,17 +30,17 @@ VALUES
 
 #For this project, I used SQL to query the Superstore database to get information about items sold at the store and their prices. 
 
-# SELECT all products and order by price
+# Use a SELECT statement to order the items by price.
 SELECT *
 FROM superstore
 ORDER BY price;
 
-# total prie for all items in database
+# Show a summary statistic about price.
 SELECT SUM(price)
 FROM superstore;
 
 
-# what is the average price of products in the Kitchen Supplies category?
+# Show a statistic about the price for items in the 'Kitchen Supplie' category.
 SELECT AVG(price)
 FROM superstore
 WHERE category = 'Kitchen Supplies';
