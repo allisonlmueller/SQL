@@ -1,0 +1,179 @@
+-- 1 Show customers who are not in the US
+SELECT
+    CustomerId,
+    FirstName || ' ' || LastName AS CustomerName,
+    Country
+FROM customers
+WHERE Country <> 'US';
+
+-- 2 Show only the customers from Brazil
+SELECT
+    CustomerId,
+    FirstName || ' ' || LastName AS CustomerName
+FROM chinook.customers
+WHERE Country = 'Brazil';
+
+-- 3 Find the invoices of customers who are from Brazil
+SELECT
+    c.FirstName || ' ' || c.LastName AS CustomerName,
+    i.InvoiceId,
+    i.InvoiceDate,
+    i.BillingCountry
+FROM customers c
+INNER JOIN invoices i
+ON c.CustomerId=i.CustomerId
+WHERE c.Country = 'Brazil';
+
+-- 4 What are total sales for 2011?
+SELECT 
+   COUNT(*) AS num_purchases,  
+   ROUND(SUM(Total),2) AS total_sales
+FROM invoices
+WHERE InvoiceDate BETWEEN '2011-01-01' AND '2011-12-31';
+
+-- 5 Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+SELECT
+    t.Name AS track_name,
+    a.Title AS album_name,
+    m.Name as media_type,
+    g.Name as genre
+FROM tracks t
+INNER JOIN genres g
+ON t.GenreId=g.GenreId
+INNER JOIN albums a
+ON t.AlbumId=a.AlbumId
+INNER JOIN media_types m
+ON t.MediaTypeId=m.MediaTypeId;
+
+-- 6 Show the total sales made by each sales agent and number of customers helped.
+SELECT
+    c.SupportRepId AS rep_id,
+    e.FirstName || ' ' || e.LastName AS support_rep,
+    COUNT(c.CustomerId) AS customers_helped,
+    ROUND(SUM(i.Total),2) AS total_sales
+FROM customers c
+LEFT JOIN employees e
+ON c.SupportRepId=e.EmployeeId
+LEFT JOIN invoices i
+ON c.CustomerId=i.CustomerId
+GROUP BY c.SupportRepId
+HAVING e.Title = 'Sales Support Agent';
+
+-- 7 Which sales agent made the most money in sales in 2011, and how much?
+SELECT
+    e.FirstName || ' ' || e.LastName AS emp_name,
+    ROUND(SUM(i.total), 2) AS sales
+FROM employees e
+INNER JOIN customers c
+ON e.EmployeeId = c.SupportRepId
+INNER JOIN invoices i
+ON c.CustomerId = i.CustomerId
+WHERE e.Title = 'Sales Support Agent'
+AND i.InvoiceDate LIKE '2011%'
+GROUP BY e.EmployeeId
+ORDER BY sales DESC
+LIMIT 1;
+    
+-- 8 Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+SELECT
+    ROUND(SUM(i.Total), 2) AS sales_total,
+    c.FirstName || ' ' || c.LastName AS customer_name,
+    c.Country AS country,
+    e.FirstName || ' ' || e.LastName AS sales_agent
+FROM customers c
+LEFT JOIN invoices i
+ON c.CustomerId = i.CustomerId
+LEFT JOIN employees e
+ON c.SupportRepId=e.EmployeeId
+GROUP BY c.CustomerId
+HAVING e.Title = 'Sales Support Agent';
+
+-- 9 What are the top 5 best selling tracks? 
+SELECT 
+    t.TrackId,
+    t.Name AS track,
+    ROUND(SUM(i.Total),2) AS total_sales
+FROM invoice_items items
+LEFT JOIN invoices i
+ON items.InvoiceId = i.InvoiceId
+LEFT JOIN tracks t
+ON items.TrackId = t.TrackId
+GROUP BY t.TrackId
+ORDER BY total_sales DESC
+LIMIT 5;
+
+-- 10 Who are the top 3 best selling artists?
+WITH song_info AS (
+    SELECT
+        a.ArtistId AS artist_id,
+        a.Name AS artist_name,
+        ab.Title AS album_title,
+        ab.AlbumId AS album_id,
+        t.TrackId AS track_id,
+        t.Name AS track_name
+        FROM artists a
+        LEFT JOIN albums ab
+        ON a.ArtistId = ab.ArtistId
+    LEFT JOIN tracks t
+    ON ab.AlbumId = t.AlbumId
+)
+
+SELECT
+    s.artist_id,
+    s.artist_name,
+    ROUND(SUM(i.total), 2) AS total_sales
+FROM song_info s
+LEFT JOIN invoice_items items
+ON s.track_id = items.TrackId
+LEFT JOIN invoices i
+ON items.InvoiceId = i.InvoiceId
+GROUP BY artist_id   
+ORDER BY total_sales DESC
+LIMIT 3; 
+
+
+-- 11 How many invoices were there in 2011?
+SELECT
+    COUNT(*)
+FROM invoices
+WHERE InvoiceDate LIKE '2011%';
+
+-- 12 What are the top 10 most profitable genre and how many tracks were sold?
+WITH track_genre AS (
+    SELECT
+        t.TrackId AS track_id,
+        g.Name AS Genre
+    FROM tracks t
+    LEFT JOIN genres g
+    ON t.GenreId = g.GenreId
+)
+
+SELECT
+    tg.Genre AS Genre,
+    COUNT(tg.track_id) AS num_tracks_sold,
+    ROUND(SUM(i.Total), 2) AS total_sales
+FROM invoices i
+INNER JOIN invoice_items it
+ON i.InvoiceId = it.InvoiceId
+LEFT JOIN track_genre tg
+ON it.TrackId = tg.track_id
+GROUP BY Genre
+ORDER BY total_sales DESC
+LIMIT 10;
+
+-- 13 Find a unique/distinct list of billing countries from the Invoice table.
+SELECT DISTINCT BillingCountry
+FROM invoices
+ORDER BY BillingCountry;
+
+-- 14 How many songs are featured on each playlist?
+SELECT
+    DISTINCT p.Name AS playlist,
+    COUNT(t.TrackId) AS num_tracks
+FROM playlists p
+LEFT JOIN playlist_track pt
+ON p.PlaylistId = pt.PlaylistId
+LEFT JOIN tracks t
+ON pt.TrackId = t.TrackId
+GROUP BY p.PlaylistId
+ORDER BY num_tracks DESC;
