@@ -1,4 +1,8 @@
--- 1 Show customers who are not in the US
+# This analysis utilizes the dataset called chinook,
+# which represents a digital media store and includes tables for artists, albums, media tracks, invoices, and customers.
+
+# Analysis
+# 1 Show customers who are not in the US
 SELECT
     CustomerId,
     FirstName || ' ' || LastName AS CustomerName,
@@ -6,14 +10,14 @@ SELECT
 FROM customers
 WHERE Country <> 'US';
 
--- 2 Show only the customers from Brazil
+# 2 Show only the customers from Brazil
 SELECT
     CustomerId,
     FirstName || ' ' || LastName AS CustomerName
 FROM chinook.customers
 WHERE Country = 'Brazil';
 
--- 3 Find the invoices of customers who are from Brazil
+# 3 Find the invoices of customers who are from Brazil
 SELECT
     c.FirstName || ' ' || c.LastName AS CustomerName,
     i.InvoiceId,
@@ -24,14 +28,14 @@ INNER JOIN invoices i
 ON c.CustomerId=i.CustomerId
 WHERE c.Country = 'Brazil';
 
--- 4 What are total sales for 2011?
+# 4 What are total sales for 2011?
 SELECT 
    COUNT(*) AS num_purchases,  
    ROUND(SUM(Total),2) AS total_sales
 FROM invoices
 WHERE InvoiceDate BETWEEN '2011-01-01' AND '2011-12-31';
 
--- 5 Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+# 5 Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
 SELECT
     t.Name AS track_name,
     a.Title AS album_name,
@@ -45,7 +49,7 @@ ON t.AlbumId=a.AlbumId
 INNER JOIN media_types m
 ON t.MediaTypeId=m.MediaTypeId;
 
--- 6 Show the total sales made by each sales agent and number of customers helped.
+# 6 Show the total sales made by each sales agent and number of customers helped.
 SELECT
     c.SupportRepId AS rep_id,
     e.FirstName || ' ' || e.LastName AS support_rep,
@@ -59,7 +63,7 @@ ON c.CustomerId=i.CustomerId
 GROUP BY c.SupportRepId
 HAVING e.Title = 'Sales Support Agent';
 
--- 7 Which sales agent made the most money in sales in 2011, and how much?
+# 7 Which sales agent made the most money in sales in 2011, and how much?
 SELECT
     e.FirstName || ' ' || e.LastName AS emp_name,
     ROUND(SUM(i.total), 2) AS sales
@@ -74,7 +78,7 @@ GROUP BY e.EmployeeId
 ORDER BY sales DESC
 LIMIT 1;
     
--- 8 Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+# 8 Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
 SELECT
     ROUND(SUM(i.Total), 2) AS sales_total,
     c.FirstName || ' ' || c.LastName AS customer_name,
@@ -88,7 +92,7 @@ ON c.SupportRepId=e.EmployeeId
 GROUP BY c.CustomerId
 HAVING e.Title = 'Sales Support Agent';
 
--- 9 What are the top 5 best selling tracks? 
+# 9 What are the top 5 best selling tracks? 
 SELECT 
     t.TrackId,
     t.Name AS track,
@@ -102,7 +106,7 @@ GROUP BY t.TrackId
 ORDER BY total_sales DESC
 LIMIT 5;
 
--- 10 Who are the top 3 best selling artists?
+# 10 Who are the top 3 best selling artists?
 WITH song_info AS (
     SELECT
         a.ArtistId AS artist_id,
@@ -131,14 +135,13 @@ GROUP BY artist_id
 ORDER BY total_sales DESC
 LIMIT 3; 
 
-
--- 11 How many invoices were there in 2011?
+# 11 How many invoices were there in 2011?
 SELECT
     COUNT(*)
 FROM invoices
 WHERE InvoiceDate LIKE '2011%';
 
--- 12 What are the top 10 most profitable genre and how many tracks were sold?
+# 12 What are the top 10 most profitable genre and how many tracks were sold?
 WITH track_genre AS (
     SELECT
         t.TrackId AS track_id,
@@ -161,12 +164,12 @@ GROUP BY Genre
 ORDER BY total_sales DESC
 LIMIT 10;
 
--- 13 Find a unique/distinct list of billing countries from the Invoice table.
+# 13 Find a unique/distinct list of billing countries from the Invoice table.
 SELECT DISTINCT BillingCountry
 FROM invoices
 ORDER BY BillingCountry;
 
--- 14 How many songs are featured on each playlist?
+# 14 How many songs are featured on each playlist?
 SELECT
     DISTINCT p.Name AS playlist,
     COUNT(t.TrackId) AS num_tracks
