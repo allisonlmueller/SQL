@@ -12,4 +12,6 @@ SQL Projects
 * Customer & Order Analytics
 
 ### Other projects
-* video_games
+* What Was the Golden Age of Video Games? (video_games.ipynb)
+* Analyze Internation Debt Statistics (intl_debt.ipynb)
+* 
