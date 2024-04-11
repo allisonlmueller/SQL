@@ -14,4 +14,7 @@ SQL Projects
 ### Other projects
 * What Was the Golden Age of Video Games? (video_games.ipynb)
 * Analyze Internation Debt Statistics (intl_debt.ipynb)
-* 
+* Analyzing Industry Carbon Emissions (carbon_emissions.ipynb)
+* Analyzing American Baby Name Trends (baby_names.ipynb)
+* What and Where are the World's Oldest Businesses? (businesses.ipynb)
+* Analyzing Students' Mental Health (mental_health.ipynb)
